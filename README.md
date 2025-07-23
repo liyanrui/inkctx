@@ -26,3 +26,5 @@ $ sh install.sh
 ## 用法
 
 打开 inkscape，通过菜单 Extensions / ConTeXt 可打开 inkctx 插件界面，在正文区域填写 ConTeXt 排版片段。模板区域可以定制 ConTeXt 排版样式，只是要注意，要保证模板内容中「`%{ConTeXt 片段}`」的存在。
+
+更详细的用法说明见 [https://zhuanlan.zhihu.com/p/1931465282087518582](https://zhuanlan.zhihu.com/p/1931465282087518582)
