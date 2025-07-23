@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <name>ConTeXt</name>
+  <id>user.context-lmtx</id>
+  <effect>
+    <object-type>all</object-type>
+  </effect>
+  <script>
+    <command location="inx" interpreter="python">ctx.py</command>
+  </script>
+  <param type="path" name="cmd" gui-text="ConTeXt 命令位于" mode="file" />
+  <param name="context-gui" type="notebook">
+    <page name="context-page" gui-text="内容">
+      <param name="ctx"
+             type="string" 
+             appearance="multiline"
+             gui-text="ConTeXt 片段" />
+    </page>
+    <page name="template-page" gui-text="模板">
+      <param name="template"
+             type="string" 
+             appearance="multiline"
+             gui-text="请保留 %{ConTeXt 片段}，其他内容可修改">
+% https://github.com/liyanrui/zhfonts
+\usemodule[zhfonts]
+\startTEXpage[offset=1pt]
+%{ConTeXt 片段}
+\stopTEXpage</param>
+    </page>
+</param>
+</inkscape-extension>
