@@ -18,6 +18,16 @@ class ConTeXt(inkex.GenerateExtension):
         bbox = self.svg.selection.bounding_box()
         return (bbox.center_x, bbox.center_y)
     
+    def process_defs(self, defs_element):
+        all_ids = self.svg.get_ids()  # 获取文档所有现有 ID
+        for def_element in defs_element:
+            # 生成不冲突的随机 ID
+            def_element.set_random_ids(backlinks=True, blacklist=all_ids)
+            # 添加到文档 defs 区域
+            self.svg.defs.append(def_element)
+            # 更新 ID 黑名单（避免后续元素冲突）
+            all_ids.add(def_element.get_id())
+            
     def generate(self):
         with tempfile.NamedTemporaryFile(suffix=".tex", mode="w+t", delete=True) as src:
             # 获得临时目录的路径
@@ -34,13 +44,18 @@ class ConTeXt(inkex.GenerateExtension):
             file_name_no_ext = os.path.splitext(src.name)[0]
             pdf_path = os.path.join(tmp_path, file_name_no_ext + ".pdf")
             svg_path = os.path.join(tmp_path, file_name_no_ext + ".svg")
-            subprocess.run(["bash", "svg-from-pdf.sh", pdf_path, svg_path],
+            subprocess.run(['inkscape', pdf_path, '--pdf-poppler',
+                            '--export-type=svg', '--export-filename', svg_path],
                            check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             # 载入 svg，创建组，取无 .svg 后缀的文件名作为组名
             svg_obj = inkex.elements.load_svg(svg_path)
             g = inkex.Group.new(file_name_no_ext)
-            g.extend(svg_obj.getroot())
-            
+            for child in svg_obj.getroot():
+                if isinstance(child, inkex.ShapeElement):
+                    g.append(child)
+                elif isinstance(child, inkex.Defs):
+                    # 处理定义元素（化解 id 重复）
+                    self.process_defs(child)
             # 定位
             unit = self.svg.unittouu("1pt")
             viewbox = svg_obj.getroot().get_viewbox()
